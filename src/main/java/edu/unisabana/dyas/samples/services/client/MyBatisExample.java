@@ -58,25 +58,30 @@ public class MyBatisExample {
      * @throws SQLException 
      */
     public static void main(String args[]) throws SQLException {
-        SqlSessionFactory sessionfact = getSqlSessionFactory();
+    SqlSessionFactory sessionfact = getSqlSessionFactory();
+    try (SqlSession sqlss = sessionfact.openSession()) {
 
-        SqlSession sqlss = sessionfact.openSession();
+        // obtener el mapper
+        edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ClienteMapper cm =
+            sqlss.getMapper(edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ClienteMapper.class);
 
-        
-        //Crear el mapper y usarlo: 
-        //ClienteMapper cm=sqlss.getMapper(ClienteMapper.class)
-        //cm...
-        
-        
-        
+        // ejecutar la consulta
+        java.util.List<edu.unisabana.dyas.samples.entities.Cliente> clientes = cm.consultarClientes();
+
+        // imprimir resultados
+        clientes.forEach(c -> {
+            System.out.println(c);
+            if (c.getRentados() != null) {
+                c.getRentados().forEach(ir -> System.out.println("\t" + ir));
+            }
+        });
+
+        // commit 
         sqlss.commit();
-        
-        
-        sqlss.close();
-
-        
-        
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
 
 }
